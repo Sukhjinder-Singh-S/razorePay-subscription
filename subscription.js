@@ -110,15 +110,15 @@ subscriptionController.webhookEventMonitor = async (req, res) => {
                     break
                 case 'subscription.authenticated': // Sent when the first payment is made on the subscription
                     console.log("subscription.authenticated: ", body.payload.subscription)
-                    await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.id }, { status: 'authenticated' })
+                    await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'authenticated' })
                     break
                 case 'subscription.activated': // Sent when the subscription moves to the active state
                     let currentDateTimeString = new Date()
                     currentDateTimeString = Math.floor(currentDateTimeString.setMinutes(currentDateTimeString.getMinutes() + 1))
                     console.log("subscription.activated: ", body.payload.subscription)
-                    let subscriptionInstance = await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.id }, { status: 'active' })
-                    await User.findOneAndUpdate({ customerId: subscriptionInstance.customerId }, { subscription: 1 })
-                    await rzp.subscriptions.update(body.payload.subscription.id, { start_at: currentDateTimeString })
+                    let subscriptionInstance = await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'active' })
+                    await User.findOneAndUpdate({ customerId: subscriptionInstance.customerId }, { subscription: true })
+                   // await rzp.subscriptions.update(body.payload.subscription.entity.id, { start_at: currentDateTimeString })
                     break
                 case 'subscription.charged': // Sent every time a successful charge is made on the subscription
                     console.log("subscription.charged: ", body.payload.subscription)

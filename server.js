@@ -13,6 +13,8 @@ app.get("/", (req, res) => {
     res.status(200).json({ msg: "Server is working fine", status: 200 });
 });
 
+app.use("/webhook", EXPRESS.raw({ type: "application/json" }));
+
 app.post("/customer", subcontroller.createUser);
 app.get("/getPlans", subcontroller.fetchPlanFromRazoro);
 app.post("/subscription", subcontroller.createSubscriptionFromRazor);
