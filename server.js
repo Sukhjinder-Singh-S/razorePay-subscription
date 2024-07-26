@@ -18,6 +18,6 @@ app.post('/subscription', subcontroller.createSubscriptionFromRazor)
 app.post('/webhook', subcontroller.webhookEventMonitor)
 
 app.listen(process.env.PORT,()=>{
-    console.log(`Server is listening on the port ${PORT}`)
+    console.log(`Server is listening on the port ${process.env.PORT}`)
 })
 
