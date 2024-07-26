@@ -13,28 +13,34 @@ let rzp = new Razorpay({
 let subscriptionController = {};
 
 /**
- * Customer for razorpay
+ * create new user for subscription
  */
-subscriptionController.createRazorCustomer = async (req, res) => {
-    try {
-        let { name, email, contact } = req.body;
+subscriptionController.createUser = async (req, res) => {
+    try { 
+        let {name, email, contact}  = req.body
+        if(!name && !email){
+            return res.status(400).json({ msg: "Name and Email are required", status: 400 });
+        }
+        let user = await User.findOne({email}).lean()
+        if(user){
+            return res.status(400).json({ msg: "User already exists", status: 400 });
+        }
         let customer = await rzp.customers.create({
             name,
             email,
             contact,
         });
-
-        console.log("customer details", customer);//cust_OcPBsVniCAxYEc
-
-        res.status(200).json({
-            msg: "Customer created successfully",
-            status: 200,
-            customerId: customer.id,
-        });
+        console.log(customer, "razor pay customer");
+        if(!customer){
+            return res.status(400).json({ msg: "Failed to create customer", status: 400 });
+        }
+        let createUser = await User.create({name, email, contact, customerId:customer.id})
+        res.status(200).json({msg:"user registered successfully", user:createUser})
     } catch (err) {
-        res.status(500).json({ msg: "Internal server error", status: 500 });
+        console.log(err);
+        res.status(500).json({ msg: "Internal server error", status: 500, error:err });
     }
-};
+}
 
 /**
  * Retrieve the plans for the subscription
@@ -44,7 +50,6 @@ subscriptionController.fetchPlanFromRazoro = async (req, res) => {
         let fetchPlan = await rzp.plans.all();
         //Subscription plan details
         console.log("Here is all plans in detail", fetchPlan);
-
         res
             .status(200)
             .json({ msg: "Successfully fetched all plans from razro", status: 200 });
@@ -58,9 +63,9 @@ subscriptionController.fetchPlanFromRazoro = async (req, res) => {
  */
 subscriptionController.createSubscriptionFromRazor = async (req, res) => {
     try {
-        let currentDateTimeString = new Date()
-        currentDateTimeString = Math.floor(currentDateTimeString.setMinutes(currentDateTimeString.getMinutes() + 1))
-        console.log('current date time string : ', currentDateTimeString)
+        // let currentDateTimeString = new Date()
+        // currentDateTimeString = Math.floor(currentDateTimeString.setMinutes(currentDateTimeString.getMinutes() + 1))
+        // console.log('current date time string : ', currentDateTimeString)
         let { plan_id, total_count, customerId, userId } = req.body
         let createSubscription = await rzp.subscriptions.create({
             plan_id,
@@ -113,7 +118,7 @@ subscriptionController.webhookEventMonitor = async (req, res) => {
                     console.log("subscription.activated: ", body.payload.subscription)
                     let subscriptionInstance = await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.id }, { status: 'active' })
                     await User.findOneAndUpdate({ customerId: subscriptionInstance.customerId }, { subscription: 1 })
-                    await rzp.subscriptions.update(body.payload.subscription.id,{start_at:currentDateTimeString})
+                    await rzp.subscriptions.update(body.payload.subscription.id, { start_at: currentDateTimeString })
                     break
                 case 'subscription.charged': // Sent every time a successful charge is made on the subscription
                     console.log("subscription.charged: ", body.payload.subscription)
