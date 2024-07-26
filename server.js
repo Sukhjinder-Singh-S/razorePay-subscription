@@ -18,6 +18,7 @@ app.use("/webhook", EXPRESS.raw({ type: "application/json" }));
 app.post("/customer", subcontroller.createUser);
 app.get("/getPlans", subcontroller.fetchPlanFromRazoro);
 app.post("/subscription", subcontroller.createSubscriptionFromRazor);
+app.post('/order', subcontroller.createOrder)
 app.post("/webhook", subcontroller.webhookEventMonitor);
 
 mongoose
