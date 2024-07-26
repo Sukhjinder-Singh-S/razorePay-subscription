@@ -105,31 +105,29 @@ subscriptionController.webhookEventMonitor = async (req, res) => {
 
             // Handle the webhook event based on its type
             switch (body.event) {
-                case 'subscription.created':
-                    console.log('Subscription created:', body.payload.subscription)
-                    break
-                case 'subscription.authenticated': // Sent when the first payment is made on the subscription
-                    console.log("subscription.authenticated: ", body.payload.subscription)
-                    await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'authenticated' })
-                    break
+                // case 'subscription.created':
+                //     console.log('Subscription created:', body.payload.subscription.entity)
+                //     break
+                // case 'subscription.authenticated': // Sent when the first payment is made on the subscription
+                //     console.log("subscription.authenticated: ", body.payload.subscription.entity)
+                //     await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'authenticated' })
+                //     break
                 case 'subscription.activated': // Sent when the subscription moves to the active state
-                    let currentDateTimeString = new Date()
-                    currentDateTimeString = Math.floor(currentDateTimeString.setMinutes(currentDateTimeString.getMinutes() + 1))
-                    console.log("subscription.activated: ", body.payload.subscription)
-                    let subscriptionInstance = await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'active' })
+                    console.log("subscription.activated: ", body.payload.subscription.entity)
+                    let subscriptionInstance = await Payment.findOneAndUpdate({ subscriptionId: body.payload.subscription.entity.id }, { status: 'active' },{new :true})
+                    console.log(subscriptionInstance,"subscription updated instance with containing the customer id: ", subscriptionInstance.id);
                     await User.findOneAndUpdate({ customerId: subscriptionInstance.customerId }, { subscription: true })
                    // await rzp.subscriptions.update(body.payload.subscription.entity.id, { start_at: currentDateTimeString })
                     break
-                case 'subscription.charged': // Sent every time a successful charge is made on the subscription
-                    console.log("subscription.charged: ", body.payload.subscription)
-                    break
-                case 'subscription.completed': // Sent when all the invoices are generated for a subscription and the subscription moves to the completed state.
-                    console.log("subscription.completed: ", body.payload.subscription)
-                    break
-                case 'subscription.cancelled':
-                    console.log('Subscription cancelled:', body.payload.subscription)
-
-                    break
+                // case 'subscription.charged': // Sent every time a successful charge is made on the subscription
+                //     console.log("subscription.charged: ", body.payload.subscription)
+                //     break
+                // case 'subscription.completed': // Sent when all the invoices are generated for a subscription and the subscription moves to the completed state.
+                //     console.log("subscription.completed: ", body.payload.subscription)
+                //     break
+                // case 'subscription.cancelled':
+                //     console.log('Subscription cancelled:', body.payload.subscription)
+                //     break
                 default:
                     console.log('Unhandled event:', body.event)
             }
