@@ -6,6 +6,7 @@ const app = EXPRESS();
 const bodyParser = require("body-parser");
 const subcontroller = require("./subscription");
 const mongoose = require("mongoose");
+const cors = require('cors')
 
 app.use(EXPRESS.json()).use(bodyParser.urlencoded({ extended: true }));
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/webhook", EXPRESS.raw({ type: "application/json" }));
+app.use(cors())
 
 app.post("/customer", subcontroller.createUser);
 app.get("/getPlans", subcontroller.fetchPlanFromRazoro);
