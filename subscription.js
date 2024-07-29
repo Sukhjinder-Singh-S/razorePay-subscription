@@ -177,7 +177,7 @@ subscriptionController.webhookEventMonitor = async (req, res) => {
                 // case 'subscription.cancelled':
                 //     console.log('Subscription cancelled:', body.payload.subscription)
                 //     break
-                
+
                 default:
                     console.log("Unhandled event:", body.event);
             }
@@ -210,6 +210,14 @@ subscriptionController.createOrder = async (req, res) => {
         res.status(500).json({ msg: "Internal server error", err });
     }
 };
+
+subscriptionController.verifyPayment = async (req, res) => {
+    try { 
+        
+    } catch (err) {
+        res.status(500).json({ msg: "Internal server error", err });
+    }
+}
 
 
 

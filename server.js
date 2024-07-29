@@ -6,6 +6,7 @@ const app = EXPRESS();
 const bodyParser = require("body-parser");
 const subcontroller = require("./subscription");
 const mongoose = require("mongoose");
+const PORT = process.env.PORT || 8000
 const cors = require('cors')
 
 app.use(EXPRESS.json()).use(bodyParser.urlencoded({ extended: true }));
