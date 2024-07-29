@@ -22,6 +22,7 @@ app.post("/customer", subcontroller.createUser);
 app.get("/getPlans", subcontroller.fetchPlanFromRazoro);
 app.post("/subscription", subcontroller.createSubscriptionFromRazor);
 app.post('/order', subcontroller.createOrder)
+app.post("/verify", subcontroller.verifyPayment)
 app.post("/webhook", subcontroller.webhookEventMonitor);
 
 mongoose
