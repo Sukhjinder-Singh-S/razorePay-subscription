@@ -197,7 +197,7 @@ subscriptionController.createOrder = async (req, res) => {
     try {
         let { amount, currency, customerId } = req.body;
         let options = {
-            amount: amount * 100,
+            amount: amount,
             currency,
             receipt: nanoid()
         };
@@ -212,22 +212,16 @@ subscriptionController.createOrder = async (req, res) => {
 };
 
 subscriptionController.verifyPayment = async (req, res) => {
-    try { 
-        body = req.body.razorpay_order_id + "|" + req.body.razorpay_payment_id;
+    try {
+        let body = `${req.body.razorpayOrderId}|${req.body.razorpayPaymentId}`;
         let expectedSignature = crypto.createHmac('sha256', process.env.KEY_SECRET)
             .update(body.toString())
             .digest('hex');
-
-        // Compare the signatures
-        if (expectedSignature === req.body.razorpay_signature) {
-            // if same, then find the previosuly stored record using orderId,
-            // and update paymentId and signature, and set status to paid.
-           console.log("Signature verify successfully");
-           res.status(200).json({msg:"Payment verify successfully"})
+        if (expectedSignature === req.body.razorpaySignature) {
+            console.log("Signature verify successfully");
+            res.status(200).json({ msg: "Payment verify successfully" })
         } else {
-            res.render('pages/payment/fail', {
-                title: "Payment verification failed",
-            })
+            res.status(404).json({msg:"Payment verification failed"})
         }
     } catch (err) {
         res.status(500).json({ msg: "Internal server error", err });
